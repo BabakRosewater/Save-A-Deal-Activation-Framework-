@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Save-A-Deal Activation Framework & Taillight Follow-Up</title>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN with Typography Plugin -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Markdown parser (Marked.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .step-section { display: none; }
+        .step-section.active { display: block; }
+
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        input:focus, textarea:focus {
+            ring: 2px;
+            ring-color: #3b82f6;
+            border-color: transparent;
+            outline: none;
+        }
+
+        .ai-loading {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            background-color: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(4px);
+        }
+
+        /* Markdown / framework styling */
+        .markdown-frame h1 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 0.75rem;
+        }
+        .markdown-frame h2 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #1d4ed8;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .markdown-frame h3 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-top: 1rem;
+            margin-bottom: 0.35rem;
+        }
+        .markdown-frame p {
+            font-size: 0.85rem;
+            color: #475569;
+            line-height: 1.6;
+            margin-bottom: 0.5rem;
+        }
+        .markdown-frame ul {
+            margin-left: 1.25rem;
+            margin-bottom: 0.75rem;
+            list-style-type: disc;
+        }
+        .markdown-frame li {
+            margin-bottom: 0.25rem;
+        }
+        .markdown-frame hr {
+            border-color: #e2e8f0;
+            margin: 1.25rem 0;
+        }
+        .markdown-frame blockquote {
+            border-left: 3px solid #3b82f6;
+            padding-left: 0.75rem;
+            margin: 0.75rem 0;
+            color: #0f172a;
+            font-style: italic;
+            background: #eff6ff;
+            padding-top: 0.4rem;
+            padding-bottom: 0.4rem;
+            border-radius: 0.25rem;
+        }
+
+        /* Hub Drawer Styles (drop-in) */
+        #hubDrawer { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .drawer-closed { transform: translateX(100%); }
+        .drawer-open { transform: translateX(0); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen pb-24">
+
+    <!-- Header -->
+    <header class="bg-slate-900 text-white px-8 py-6 shadow-xl">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="bg-blue-600 p-2.5 rounded-xl shadow-lg shadow-blue-500/20">
+                    <i data-lucide="sparkles" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-black tracking-tighter uppercase leading-none">Save-A-Deal Activation Framework</h1>
+                    <p class="text-blue-400 text-sm font-bold tracking-tight">✨ AI-Powered Follow-Up Engine</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="hidden md:flex items-center bg-white/10 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-slate-300 border border-white/5 mr-2">
+                    Strategic Sales Retention System
+                    <button onclick="toggleSettingsModal()" class="ml-2 hover:text-white transition-colors">
+                        <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button id="btnHub" class="btn-hover flex items-center gap-2 px-4 py-2 bg-[#002c5f] text-white rounded-xl text-xs font-black uppercase tracking-wider hover:bg-slate-800 transition-all active:scale-95" title="Open Hub">
+                        <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                        Hub
+                    </button>
+                    <button onclick="toggleSettingsModal()" class="md:hidden p-2 rounded-lg bg-white/10 text-slate-300" title="Settings">
+                        <i data-lucide="settings" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 modal-overlay">
+        <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-fade-in">
+            <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-slate-900 text-white p-2 rounded-lg">
+                        <i data-lucide="settings" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-800 uppercase tracking-tight">System Settings</h3>
+                </div>
+                <button onclick="toggleSettingsModal()" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-8 space-y-6">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Gemini API Key</label>
+                    <div class="relative">
+                        <input type="password" id="apiKeyInput" placeholder="Enter your Gemini API key"
+                               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-mono focus:ring-2 focus:ring-blue-500 transition-all pr-12">
+                        <button onclick="togglePasswordVisibility()" class="absolute right-4 top-3.5 text-slate-400 hover:text-slate-600">
+                            <i id="eyeIcon" data-lucide="eye" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <p class="text-[10px] text-slate-400 italic">Key is stored locally in your browser for session security.</p>
+                </div>
+                <button onclick="saveSettings()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 flex items-center justify-center">
+                    <i data-lucide="save" class="w-4 h-4 mr-2"></i>
+                    Save Configuration
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto w-full px-8 py-8 space-y-8">
+
+        <!-- Core Principle Card -->
+        <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-8 text-slate-50 pointer-events-none opacity-50">
+                <i data-lucide="quote" class="w-24 h-24"></i>
+            </div>
+            <div class="relative z-10 flex flex-col md:flex-row md:items-center gap-8">
+                <div class="md:w-1/2">
+                    <span class="text-blue-600 text-[10px] font-black uppercase tracking-[0.2em]">Core Principle</span>
+                    <p class="text-2xl font-bold text-slate-900 mt-2 mb-4">
+                        "If a guest leaves without buying, the deal is not dead. But our ability to save the deal tomorrow depends on what we did before their taillights left the curb."
+                    </p>
+                </div>
+                <div class="md:w-1/2 md:border-l md:border-slate-100 md:pl-8">
+                    <ul class="grid grid-cols-1 gap-3">
+                        <li class="flex items-center space-x-3 text-slate-500 text-sm font-medium">
+                            <div class="bg-green-100 p-1 rounded-full text-green-600"><i data-lucide="check" class="w-3 h-3"></i></div>
+                            <span>Make a clear, specific promise.</span>
+                        </li>
+                        <li class="flex items-center space-x-3 text-slate-500 text-sm font-medium">
+                            <div class="bg-green-100 p-1 rounded-full text-green-600"><i data-lucide="check" class="w-3 h-3"></i></div>
+                            <span>Show immediate gratitude.</span>
+                        </li>
+                        <li class="flex items-center space-x-3 text-slate-500 text-sm font-medium">
+                            <div class="bg-green-100 p-1 rounded-full text-green-600"><i data-lucide="check" class="w-3 h-3"></i></div>
+                            <span>Send value-focused recap links.</span>
+                        </li>
+                        <li class="flex items-center space-x-3 text-slate-500 text-sm font-medium">
+                            <div class="bg-green-100 p-1 rounded-full text-green-600"><i data-lucide="check" class="w-3 h-3"></i></div>
+                            <span>Document strong CRM notes.</span>
+                        </li>
+                        <li class="flex items-center space-x-3 text-slate-500 text-sm font-medium">
+                            <div class="bg-green-100 p-1 rounded-full text-green-600"><i data-lucide="check" class="w-3 h-3"></i></div>
+                            <span>Fulfill the promise on schedule.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step Selector -->
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex overflow-x-auto md:overflow-hidden scrollbar-hide">
+            <button onclick="goToStep(1)" class="step-btn flex-1 flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 min-w-[120px]" data-step="1">
+                <div class="step-icon-box p-3 rounded-2xl mb-2 bg-slate-100 text-slate-400">
+                    <i data-lucide="calendar-clock" class="w-5 h-5"></i>
+                </div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">The Promise</span>
+            </button>
+            <button onclick="goToStep(2)" class="step-btn flex-1 flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 min-w-[120px]" data-step="2">
+                <div class="step-icon-box p-3 rounded-2xl mb-2 bg-slate-100 text-slate-400">
+                    <i data-lucide="message-square" class="w-5 h-5"></i>
+                </div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Taillight Text</span>
+            </button>
+            <button onclick="goToStep(3)" class="step-btn flex-1 flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 min-w-[120px]" data-step="3">
+                <div class="step-icon-box p-3 rounded-2xl mb-2 bg-slate-100 text-slate-400">
+                    <i data-lucide="mail" class="w-5 h-5"></i>
+                </div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Same-Day Email</span>
+            </button>
+            <button onclick="goToStep(4)" class="step-btn flex-1 flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 min-w-[120px]" data-step="4">
+                <div class="step-icon-box p-3 rounded-2xl mb-2 bg-slate-100 text-slate-400">
+                    <i data-lucide="clipboard-check" class="w-5 h-5"></i>
+                </div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">CRM Strategy</span>
+            </button>
+            <button onclick="goToStep(5)" class="step-btn flex-1 flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 min-w-[120px]" data-step="5">
+                <div class="step-icon-box p-3 rounded-2xl mb-2 bg-slate-100 text-slate-400">
+                    <i data-lucide="zap" class="w-5 h-5"></i>
+                </div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Fulfillment</span>
+            </button>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+            <!-- Left Column: Deal Intel -->
+            <div class="md:col-span-1 space-y-6">
+                <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm space-y-6 sticky top-8">
+                    <div class="flex items-center space-x-2 text-slate-800 border-b border-slate-100 pb-4">
+                        <i data-lucide="user-plus" class="w-5 h-5 text-blue-500"></i>
+                        <h3 class="font-bold uppercase tracking-widest text-xs">Deal Intel</h3>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Guest Name</label>
+                            <input type="text" id="guestName" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium transition-all">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Vehicle Info</label>
+                            <input type="text" id="vehicleInfo" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium transition-all">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Motivator</label>
+                            <input type="text" id="motivator" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium transition-all">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Promised Info</label>
+                            <input type="text" id="promisedInfo" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium transition-all">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Promised Time</label>
+                            <input type="text" id="promisedTime" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium transition-all">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Top Objection ✨</label>
+                            <textarea id="objection" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium transition-all h-20 resize-none" placeholder="e.g. Price is too high, need to talk to spouse..."></textarea>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Dealership</label>
+                            <input type="text" id="dealershipName" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium transition-all">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Salesperson</label>
+                            <input type="text" id="salespersonName" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium transition-all">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Interactive Content -->
+            <div class="md:col-span-2">
+                <div class="bg-white p-10 rounded-3xl border border-slate-200 shadow-sm min-h-[600px] relative">
+
+                    <!-- Step 1: The Promise -->
+                    <div id="step1" class="step-section animate-fade-in space-y-6">
+                        <div class="flex items-center justify-between">
+                            <div class="space-y-2">
+                                <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Step 1: Make a Specific Promise</h2>
+                                <p class="text-slate-500 text-sm italic">Establish reliability before they drive away.</p>
+                            </div>
+                            <button onclick="getAiStrategy()" id="aiStrategyBtn" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all flex items-center">
+                                <i data-lucide="sparkles" class="w-3.5 h-3.5 mr-2"></i>
+                                <span>✨ Get AI Strategy</span>
+                            </button>
+                        </div>
+
+                        <div id="aiStrategyResult" class="hidden bg-indigo-50 border border-indigo-100 p-6 rounded-2xl animate-fade-in">
+                            <div class="flex items-center space-x-2 mb-3 text-indigo-700 font-bold text-xs uppercase tracking-wider">
+                                <i data-lucide="brain-circuit" class="w-4 h-4"></i>
+                                <span>AI Strategic Hook</span>
+                            </div>
+                            <p id="aiStrategyText" class="text-sm text-indigo-900 leading-relaxed"></p>
+                        </div>
+
+                        <div class="bg-blue-50 border-l-4 border-blue-500 p-8 rounded-r-2xl">
+                            <p id="promiseQuote" class="text-lg text-slate-700 leading-relaxed font-medium italic"></p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="flex items-center space-x-3 bg-white border border-slate-100 p-4 rounded-xl shadow-sm">
+                                <div class="bg-blue-100 p-2 rounded-lg text-blue-600"><i data-lucide="target" class="w-4 h-4"></i></div>
+                                <span class="text-xs font-semibold text-slate-600">Tie to Motivator</span>
+                            </div>
+                            <div class="flex items-center space-x-3 bg-white border border-slate-100 p-4 rounded-xl shadow-sm">
+                                <div class="bg-blue-100 p-2 rounded-lg text-blue-600"><i data-lucide="clock" class="w-4 h-4"></i></div>
+                                <span class="text-xs font-semibold text-slate-600">Set clear deadline</span>
+                            </div>
+                            <div class="flex items-center space-x-3 bg-white border border-slate-100 p-4 rounded-xl shadow-sm">
+                                <div class="bg-blue-100 p-2 rounded-lg text-blue-600"><i data-lucide="hourglass" class="w-4 h-4"></i></div>
+                                <span class="text-xs font-semibold text-slate-600">Expectation</span>
+                            </div>
+                        </div>
+                        <div id="panel-overview" class="framework-panel" data-source="overview"></div>
+                    </div>
+
+                    <!-- Step 2: Taillight Text -->
+                    <div id="step2" class="step-section animate-fade-in space-y-6">
+                        <div class="space-y-2">
+                            <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Step 2: Taillight Text</h2>
+                            <p class="text-slate-500 text-sm italic">Gratitude only. Send within 10-20 minutes of departure.</p>
+                        </div>
+                        <div class="bg-slate-900 rounded-2xl p-6 shadow-2xl">
+                            <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+                                <span class="text-slate-500 text-[10px] font-bold uppercase tracking-widest">SMS Preview</span>
+                                <div class="flex space-x-2">
+                                    <button onclick="getAiObjectionCrusher()" class="text-blue-400 hover:text-blue-300 text-xs font-bold transition-colors flex items-center">
+                                        <i data-lucide="sparkles" class="w-3.5 h-3.5 mr-1"></i>
+                                        <span>✨ Crush Objection</span>
+                                    </button>
+                                    <button onclick="copyStepContent('sms')" class="copy-btn text-white hover:text-blue-300 text-xs font-bold transition-colors flex items-center border-l border-slate-800 pl-2">
+                                        <i data-lucide="copy" class="w-3.5 h-3.5 mr-1"></i>
+                                        <span class="btn-text">Copy Text</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <p id="taillightSms" class="text-white font-mono text-sm leading-relaxed italic"></p>
+                        </div>
+
+                        <div id="aiObjectionResult" class="hidden bg-emerald-50 border border-emerald-100 p-6 rounded-2xl animate-fade-in">
+                            <div class="flex items-center space-x-2 mb-3 text-emerald-700 font-bold text-xs uppercase tracking-wider">
+                                <i data-lucide="shield-check" class="w-4 h-4"></i>
+                                <span>AI Objection Talk Track</span>
+                            </div>
+                            <p id="aiObjectionText" class="text-sm text-emerald-900 leading-relaxed font-medium italic"></p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-indigo-50 p-6 rounded-2xl border border-indigo-100">
+                                <h4 class="font-bold text-indigo-900 text-sm mb-2">No Selling</h4>
+                                <p class="text-indigo-700 text-xs leading-relaxed">This is about appreciation, not the transaction.</p>
+                            </div>
+                            <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100">
+                                <h4 class="font-bold text-blue-900 text-sm mb-2">Relationship</h4>
+                                <p class="text-blue-700 text-xs leading-relaxed">This is how we stand out vs other dealers.</p>
+                            </div>
+                        </div>
+                        <div id="panel-playbook" class="framework-panel" data-source="playbook"></div>
+                    </div>
+
+                    <!-- Step 3: Same-Day Email -->
+                    <div id="step3" class="step-section animate-fade-in space-y-6">
+                        <div class="flex items-center justify-between">
+                            <div class="space-y-2">
+                                <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Step 3: Same-Day Email</h2>
+                                <p class="text-slate-500 text-sm italic">The digital anchor. Sent before EOD.</p>
+                            </div>
+                            <button onclick="getAiEmailPolish()" id="aiEmailBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all flex items-center">
+                                <i data-lucide="wand-2" class="w-3.5 h-3.5 mr-2"></i>
+                                <span>✨ AI Polish Email</span>
+                            </button>
+                        </div>
+                        <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                            <div class="bg-slate-50 p-4 border-b border-slate-200 flex items-center justify-between">
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] uppercase font-bold text-slate-400 mb-1">Subject</span>
+                                    <span id="emailSubject" class="text-sm font-bold text-slate-700"></span>
+                                </div>
+                                <button onclick="copyStepContent('email')" class="copy-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 p-2 rounded-lg transition-all">
+                                    <i data-lucide="copy" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                            <div class="p-6">
+                                <pre id="emailBody" class="whitespace-pre-wrap text-sm text-slate-600 font-sans leading-relaxed"></pre>
+                            </div>
+                        </div>
+                        <div id="panel-playbook-email" class="framework-panel" data-source="playbook"></div>
+                    </div>
+
+                    <!-- Step 4: CRM Strategy -->
+                    <div id="step4" class="step-section animate-fade-in space-y-6">
+                        <div class="space-y-2">
+                            <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Step 4: CRM Strategy</h2>
+                            <p class="text-slate-500 text-sm italic">Clean data is the fuel for Save-A-Deal meetings.</p>
+                        </div>
+                        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-sm font-bold text-slate-800">Salesperson & Manager Draft</h3>
+                                <button onclick="copyStepContent('crm')" class="copy-btn bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-2">
+                                    <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                                    <span class="btn-text">Copy CRM Notes</span>
+                                </button>
+                            </div>
+                            <pre id="crmNotes" class="bg-slate-50 p-4 rounded-xl border border-slate-100 font-mono text-xs text-slate-600 leading-relaxed"></pre>
+                        </div>
+                        <div id="panel-checklist" class="framework-panel" data-source="checklist"></div>
+                    </div>
+
+                    <!-- Step 5: Fulfillment -->
+                    <div id="step5" class="step-section animate-fade-in space-y-6">
+                        <div class="space-y-2">
+                            <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Step 5: Fulfillment</h2>
+                            <p class="text-slate-500 text-sm italic">Closing the loop and reopening the conversation.</p>
+                        </div>
+                        <div class="bg-slate-900 text-white rounded-2xl p-6 shadow-xl">
+                            <div class="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
+                                <span class="text-[10px] font-bold text-white/40 tracking-widest uppercase">Next-Day SMS Ping</span>
+                                <button onclick="copyStepContent('ping')" class="copy-btn text-blue-400 hover:text-blue-300 transition-colors">
+                                    <i data-lucide="copy" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                            <p id="fulfillmentPing" class="font-mono text-sm leading-relaxed text-blue-100 italic"></p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="bg-white border border-slate-100 p-4 rounded-xl shadow-sm text-center">
+                                <h5 class="text-[10px] font-bold text-blue-600 uppercase mb-1">Precision</h5>
+                                <p class="text-[11px] text-slate-500 leading-tight">Send specs before deadline.</p>
+                            </div>
+                            <div class="bg-white border border-slate-100 p-4 rounded-xl shadow-sm text-center">
+                                <h5 class="text-[10px] font-bold text-blue-600 uppercase mb-1">Promptness</h5>
+                                <p class="text-[11px] text-slate-500 leading-tight">SMS ping after email.</p>
+                            </div>
+                            <div class="bg-white border border-slate-100 p-4 rounded-xl shadow-sm text-center">
+                                <h5 class="text-[10px] font-bold text-blue-600 uppercase mb-1">Partnership</h5>
+                                <p class="text-[11px] text-slate-500 leading-tight">Review with Manager.</p>
+                            </div>
+                        </div>
+                        <div id="panel-wordtracks" class="framework-panel" data-source="wordTracks"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Navigation -->
+    <footer class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-slate-200 p-4 z-40">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <button id="prevBtn" onclick="prevStep()" class="flex items-center space-x-2 px-6 py-3 rounded-2xl font-bold text-sm transition-all hover:bg-slate-50 text-slate-700">
+                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                <span>Previous</span>
+            </button>
+
+            <div id="stepDots" class="flex items-center space-x-2">
+                <!-- Dots generated by JS -->
+            </div>
+
+            <button id="nextBtn" onclick="nextStep()" class="flex items-center space-x-2 px-6 py-3 rounded-2xl font-bold text-sm transition-all bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-900/10">
+                <span>Next Step</span>
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-xl shadow-2xl opacity-0 pointer-events-none transition-all duration-300 flex items-center space-x-3 z-50">
+        <i data-lucide="check-circle" class="w-5 h-5 text-green-400"></i>
+        <span class="text-sm font-medium">Copied to clipboard</span>
+    </div>
+
+    <!-- Master Hub Drawer -->
+    <div id="hubOverlay"
+      class="fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-[150] hidden opacity-0 transition-opacity duration-300"></div>
+
+    <div id="hubDrawer"
+      class="fixed top-0 right-0 h-full w-full max-w-sm bg-white z-[160] drawer-closed shadow-2xl flex flex-col">
+
+      <div class="p-8 border-b flex items-center justify-between bg-slate-50">
+        <div>
+          <h3 class="text-xl font-black text-slate-900 leading-none mb-1">Master Index</h3>
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Cam Clark Sales • Service • Parts</p>
+        </div>
+        <button id="hubCloseBtn" class="p-2 hover:bg-white rounded-xl text-slate-400" title="Close">
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
+        <section>
+          <a href="https://sales-service-parts-hub.pages.dev" target="_blank"
+            class="flex items-center gap-4 p-5 bg-blue-50 rounded-3xl border border-blue-100 hover:bg-blue-100 transition-all group">
+            <div class="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200">
+              <i data-lucide="home" class="w-6 h-6"></i>
+            </div>
+            <div class="flex-1">
+              <span class="text-xs font-black text-blue-600 uppercase tracking-widest block mb-1">Central Launchpad</span>
+              <span class="text-sm font-bold text-blue-900 group-hover:underline">Main Hub Landing Page</span>
+            </div>
+          </a>
+        </section>
+
+        <section class="space-y-3">
+          <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Sales • Inventory • CRM</h4>
+          <div class="grid gap-2">
+            <a href="https://sales-battle-card.pages.dev/region_incentives/" target="_blank"
+              class="flex items-center gap-4 p-4 hover:bg-slate-50 rounded-2xl border border-transparent hover:border-slate-100 transition-all">
+              <i data-lucide="trending-up" class="w-5 h-5 text-indigo-500"></i>
+              <span class="text-sm font-bold text-slate-700">Core Incentives Matrix</span>
+            </a>
+
+            <a href="https://clark-inventory-finder.pages.dev" target="_blank"
+              class="flex items-center gap-4 p-4 hover:bg-slate-50 rounded-2xl border border-transparent hover:border-slate-100 transition-all">
+              <i data-lucide="search" class="w-5 h-5 text-blue-500"></i>
+              <span class="text-sm font-bold text-slate-700">Inventory Finder</span>
+            </a>
+
+            <a href="https://save-a-deal-logic.pages.dev" target="_blank"
+              class="flex items-center gap-4 p-4 hover:bg-slate-50 rounded-2xl border border-transparent hover:border-slate-100 transition-all">
+              <i data-lucide="shield-check" class="w-5 h-5 text-emerald-500"></i>
+              <span class="text-sm font-bold text-slate-700">Save-A-Deal Logic</span>
+            </a>
+
+            <a href="https://sales-battle-card.pages.dev/daily_training/save-a-deal_activation_framework/" target="_blank"
+              class="flex items-center gap-4 p-4 hover:bg-slate-50 rounded-2xl border border-transparent hover:border-slate-100 transition-all">
+              <i data-lucide="zap" class="w-5 h-5 text-orange-500"></i>
+              <span class="text-sm font-bold text-slate-700">Activation Framework</span>
+            </a>
+          </div>
+        </section>
+
+        <section class="space-y-3">
+          <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Training • Coaching</h4>
+          <div class="grid gap-2">
+            <a href="https://signature-sales-journey-app.pages.dev" target="_blank"
+              class="flex items-center gap-4 p-4 hover:bg-slate-50 rounded-2xl border border-transparent hover:border-slate-100 transition-all">
+              <i data-lucide="graduation-cap" class="w-5 h-5 text-purple-500"></i>
+              <span class="text-sm font-bold text-slate-700">Sales Journey Training</span>
+            </a>
+
+            <a href="https://signature-sales-journey-app.pages.dev/data_capture_map/" target="_blank"
+              class="flex items-center gap-4 p-4 hover:bg-slate-50 rounded-2xl border border-transparent hover:border-slate-100 transition-all">
+              <i data-lucide="map" class="w-5 h-5 text-rose-500"></i>
+              <span class="text-sm font-bold text-slate-700">CRM Notes Coach</span>
+            </a>
+          </div>
+        </section>
+
+        <section class="space-y-3">
+          <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Service Excellence</h4>
+          <div class="grid gap-2">
+            <a href="https://service-battle-card.pages.dev/" target="_blank"
+              class="flex items-center gap-4 p-4 hover:bg-slate-50 rounded-2xl border border-transparent hover:border-slate-100 transition-all">
+              <i data-lucide="wrench" class="w-5 h-5 text-amber-500"></i>
+              <span class="text-sm font-bold text-slate-700">Service Battle Cards</span>
+            </a>
+          </div>
+        </section>
+      </div>
+
+      <div class="p-6 bg-slate-50 border-t">
+        <div class="p-4 bg-white rounded-2xl border border-slate-200">
+          <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 text-center">App Status</p>
+          <div class="flex items-center justify-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span class="text-[10px] font-bold text-slate-600">All Systems Operational</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+        // --- Gemini API Configuration ---
+        let currentApiKey = localStorage.getItem('gemini_api_key') || "";
+        const GEMINI_MODEL = "gemini-2.5-flash-preview-09-2025";
+
+        async function callGemini(prompt, systemInstruction) {
+            if (!currentApiKey) {
+                toggleSettingsModal();
+                throw new Error('API Key Required');
+            }
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${currentApiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: systemInstruction }] }
+            };
+
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error('API Error');
+                    const data = await response.json();
+                    return data.candidates?.[0]?.content?.parts?.[0]?.text;
+                } catch (e) {
+                    const delay = Math.pow(2, i) * 1000;
+                    await new Promise(r => setTimeout(r, delay));
+                }
+            }
+            throw new Error('Failed after retries');
+        }
+
+        // --- Settings Modal Logic ---
+        function toggleSettingsModal() {
+            const modal = document.getElementById('settingsModal');
+            const input = document.getElementById('apiKeyInput');
+            input.value = currentApiKey;
+            modal.classList.toggle('hidden');
+            modal.classList.toggle('flex');
+            lucide.createIcons();
+        }
+
+        // --- Hub Drawer Logic ---
+        function toggleHub(forceState) {
+            const hubOverlay = document.getElementById('hubOverlay');
+            const hubDrawer = document.getElementById('hubDrawer');
+            const isOpen = hubDrawer.classList.contains('drawer-open');
+            const willOpen = typeof forceState === 'boolean' ? forceState : !isOpen;
+
+            if (willOpen) {
+                hubOverlay.classList.remove('hidden');
+                requestAnimationFrame(() => {
+                    hubOverlay.classList.add('opacity-100');
+                    hubOverlay.classList.remove('opacity-0');
+                });
+                hubDrawer.classList.remove('drawer-closed');
+                hubDrawer.classList.add('drawer-open');
+                document.body.style.overflow = 'hidden';
+                lucide.createIcons();
+            } else {
+                hubDrawer.classList.remove('drawer-open');
+                hubDrawer.classList.add('drawer-closed');
+                hubOverlay.classList.remove('opacity-100');
+                hubOverlay.classList.add('opacity-0');
+                setTimeout(() => {
+                    if (!hubDrawer.classList.contains('drawer-open')) {
+                        hubOverlay.classList.add('hidden');
+                    }
+                }, 300);
+                document.body.style.overflow = '';
+            }
+        }
+
+        function togglePasswordVisibility() {
+            const input = document.getElementById('apiKeyInput');
+            const eyeIcon = document.getElementById('eyeIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                eyeIcon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                input.type = 'password';
+                eyeIcon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        }
+
+        function saveSettings() {
+            const val = document.getElementById('apiKeyInput').value.trim();
+            currentApiKey = val;
+            localStorage.setItem('gemini_api_key', val);
+            toggleSettingsModal();
+            showToast("Settings Saved");
+        }
+
+        // --- Repository Configuration ---
+        const REPO_BASE = "https://raw.githubusercontent.com/BabakRosewater/Save-A-Deal-Activation-Framework-/main";
+        const SOURCES = {
+            overview: `${REPO_BASE}/content/1_overview.md`,
+            playbook: `${REPO_BASE}/content/2_playbook.md`,
+            checklist: `${REPO_BASE}/content/3_checklist.md`,
+            wordTracks: `${REPO_BASE}/content/4_word_tracks.md`
+        };
+
+        // --- Application State ---
+        let activeStep = 1;
+        const formData = {
+            guestName: "John",
+            vehicleInfo: "2024 Tucson SEL",
+            motivator: "towing capacity for a small camper",
+            promisedInfo: "the exact towing specs and package requirements",
+            promisedTime: "tomorrow before 12:00 p.m.",
+            objection: "",
+            dealershipName: "Clark Hyundai",
+            salespersonName: "Babak"
+        };
+        const contentState = {
+            overview: { data: null, loading: true, error: null },
+            playbook: { data: null, loading: true, error: null },
+            checklist: { data: null, loading: true, error: null },
+            wordTracks: { data: null, loading: true, error: null }
+        };
+
+        // --- DOM Elements ---
+        const inputs = ['guestName', 'vehicleInfo', 'motivator', 'promisedInfo', 'promisedTime', 'objection', 'dealershipName', 'salespersonName'];
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            inputs.forEach(id => {
+                const el = document.getElementById(id);
+                el.value = formData[id];
+                el.addEventListener('input', (e) => handleInputChange(id, e.target.value));
+            });
+
+            document.getElementById('btnHub')?.addEventListener('click', () => toggleHub(true));
+            document.getElementById('hubCloseBtn')?.addEventListener('click', () => toggleHub(false));
+            document.getElementById('hubOverlay')?.addEventListener('click', () => toggleHub(false));
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && document.getElementById('hubDrawer')?.classList.contains('drawer-open')) {
+                    toggleHub(false);
+                }
+            });
+
+            fetchAllFrameworkContent();
+            updateUI();
+            lucide.createIcons();
+        });
+
+        // --- Handlers ---
+        function handleInputChange(field, value) {
+            formData[field] = value;
+            updateDynamicText();
+        }
+
+        async function fetchFile(key) {
+            contentState[key].loading = true;
+            contentState[key].error = null;
+            renderFrameworkPanels();
+
+            try {
+                const res = await fetch(SOURCES[key]);
+                if (!res.ok) throw new Error(`Status ${res.status}`);
+                contentState[key].data = await res.text();
+                contentState[key].loading = false;
+            } catch (err) {
+                contentState[key].error = err.message;
+                contentState[key].loading = false;
+            }
+            renderFrameworkPanels();
+        }
+
+        async function fetchAllFrameworkContent() {
+            Object.keys(SOURCES).forEach(key => fetchFile(key));
+        }
+
+        // --- AI Features ---
+        async function getAiStrategy() {
+            const btn = document.getElementById('aiStrategyBtn');
+            const resultDiv = document.getElementById('aiStrategyResult');
+            const resultText = document.getElementById('aiStrategyText');
+
+            btn.classList.add('ai-loading');
+            btn.disabled = true;
+
+            const system = "You are a senior automotive sales consultant. Suggest a high-value 'promise hook' that is non-salesy and genuinely helpful based on a guest's motivator. Keep it under 2 sentences.";
+            const prompt = `Guest: ${formData.guestName}. Vehicle: ${formData.vehicleInfo}. Motivator: ${formData.motivator}. Promise already made: ${formData.promisedInfo}. Suggest a creative strategic hook to add value.`;
+
+            try {
+                const result = await callGemini(prompt, system);
+                resultText.textContent = result;
+                resultDiv.classList.remove('hidden');
+            } catch (e) {
+                if (e.message !== 'API Key Required') {
+                    resultText.textContent = "AI hook generation unavailable. Focus on the core promise.";
+                    resultDiv.classList.remove('hidden');
+                }
+            } finally {
+                btn.classList.remove('ai-loading');
+                btn.disabled = false;
+            }
+        }
+
+        async function getAiObjectionCrusher() {
+            const resultDiv = document.getElementById('aiObjectionResult');
+            const resultText = document.getElementById('aiObjectionText');
+
+            if (!formData.objection) {
+                showToast("Please enter an objection in Deal Intel first.");
+                return;
+            }
+
+            const system = "You are a senior sales coach. Generate a short, empathy-first 'Save-A-Deal' talk track to handle a specific car sales objection. Keep it conversational and focus on gratitude for their time. Max 3 sentences.";
+            const prompt = `Guest ${formData.guestName} had this objection: "${formData.objection}". They were looking at ${formData.vehicleInfo} and care about ${formData.motivator}. Provide an empathy-based talk track.`;
+
+            try {
+                resultText.textContent = "✨ Coaching in progress...";
+                resultDiv.classList.remove('hidden');
+                const result = await callGemini(prompt, system);
+                resultText.textContent = result;
+            } catch (e) {
+                if (e.message !== 'API Key Required') resultText.textContent = "Coaching unavailable. Stick to pure gratitude.";
+            }
+        }
+
+        async function getAiEmailPolish() {
+            const btn = document.getElementById('aiEmailBtn');
+            const emailBodyEl = document.getElementById('emailBody');
+
+            const currentBody = emailBodyEl.textContent;
+            btn.classList.add('ai-loading');
+            btn.disabled = true;
+
+            const system = "You are a professional sales writer. Rewrite the provided car dealership follow-up email to be more warm, persuasive, and focused on the value being provided. Do not use generic corporate jargon. Keep the structure: Thanks, Recap, Links, Promise. Use placeholders like [Link] where appropriate.";
+            const prompt = `Rewrite this email for ${formData.guestName} at ${formData.dealershipName}: \n\n ${currentBody}`;
+
+            try {
+                const result = await callGemini(prompt, system);
+                emailBodyEl.textContent = result;
+                showToast("Email polished with AI! ✨");
+            } catch (e) {
+                if (e.message !== 'API Key Required') showToast("AI Polish failed.");
+            } finally {
+                btn.classList.remove('ai-loading');
+                btn.disabled = false;
+            }
+        }
+
+        // --- UI Logic ---
+        function updateUI() {
+            updateStepVisibility();
+            updateStepSelector();
+            updateFooter();
+            updateDynamicText();
+            lucide.createIcons();
+        }
+
+        function updateStepVisibility() {
+            document.querySelectorAll('.step-section').forEach((section, idx) => {
+                section.classList.toggle('active', (idx + 1) === activeStep);
+            });
+        }
+
+        function updateStepSelector() {
+            document.querySelectorAll('.step-btn').forEach((btn, idx) => {
+                const stepNum = idx + 1;
+                const isActive = stepNum === activeStep;
+                const iconBox = btn.querySelector('.step-icon-box');
+                const label = btn.querySelector('span');
+
+                btn.classList.toggle('scale-105', isActive);
+                btn.classList.toggle('bg-slate-50', isActive);
+                btn.classList.toggle('opacity-40', !isActive);
+                btn.classList.toggle('grayscale', !isActive);
+
+                if (isActive) {
+                    iconBox.className = "step-icon-box p-3 rounded-2xl mb-2 bg-blue-600 text-white shadow-lg shadow-blue-500/30";
+                    label.className = "text-[10px] font-black uppercase tracking-widest text-blue-600";
+                } else {
+                    iconBox.className = "step-icon-box p-3 rounded-2xl mb-2 bg-slate-100 text-slate-400";
+                    label.className = "text-[10px] font-black uppercase tracking-widest text-slate-500";
+                }
+            });
+        }
+
+        function updateFooter() {
+            document.getElementById('prevBtn').disabled = activeStep === 1;
+            document.getElementById('nextBtn').disabled = activeStep === 5;
+
+            const dotsContainer = document.getElementById('stepDots');
+            dotsContainer.innerHTML = '';
+            for(let i=1; i<=5; i++) {
+                const dot = document.createElement('div');
+                dot.className = `h-1.5 rounded-full transition-all duration-500 ${activeStep === i ? 'w-8 bg-blue-600' : 'w-2 bg-slate-200'}`;
+                dotsContainer.appendChild(dot);
+            }
+        }
+
+        function updateDynamicText() {
+            document.getElementById('promiseQuote').textContent = `"${formData.guestName}, before you go, I want to make sure you have everything you need to make a comfortable decision. You mentioned ${formData.motivator} is important, so I’m going to pull ${formData.promisedInfo}. I’ll send that to you by ${formData.promisedTime}. Does that work for you?"`;
+            document.getElementById('taillightSms').textContent = `${formData.guestName}, thank you again for coming in today. I really appreciated our time together and I’ll have ${formData.promisedInfo} to you by ${formData.promisedTime}. – ${formData.salespersonName}, ${formData.dealershipName}`;
+            document.getElementById('emailSubject').textContent = `Thank you for visiting ${formData.dealershipName} today, ${formData.guestName}`;
+            document.getElementById('emailBody').textContent = `Hi ${formData.guestName},\n\nThank you again for spending time with me today at ${formData.dealershipName}. I really appreciated the opportunity to learn what you're looking for.\n\nQuick recap of what we discussed:\n• Your interest in the ${formData.vehicleInfo}\n• Staying focused on ${formData.motivator}\n\nUseful links for your research:\n[Vehicle Detail Page Link]\n[Credit Application Link]\n[Trade Appraisal Link]\n\nAs promised, I will have ${formData.promisedInfo} to you by ${formData.promisedTime}.\n\nI'm here as a resource whenever you need. No pressure.\n\nBest,\n${formData.salespersonName}`;
+            document.getElementById('crmNotes').textContent = `[SALESPERSON NOTES]\nMOTIVATOR: ${formData.motivator}\nVEHICLE: ${formData.vehicleInfo}\nOBJECTION: ${formData.objection || 'None noted'}\nPROMISE: ${formData.promisedInfo} by ${formData.promisedTime}\n\n[MANAGER NOTES]\nMANAGER INTRO: Completed\nREAD: ${formData.guestName} is warm, focused on ${formData.motivator}.\nSTRATEGY: Follow up with promised info precisely at ${formData.promisedTime}.`;
+            document.getElementById('fulfillmentPing').textContent = `"${formData.guestName}, as promised I just sent you an email with ${formData.promisedInfo}. Please take a look when you have a moment and I’ll give you a quick call later today to get your thoughts. – ${formData.salespersonName}"`;
+        }
+
+        function renderFrameworkPanels() {
+            document.querySelectorAll('.framework-panel').forEach(panel => {
+                const sourceKey = panel.getAttribute('data-source');
+                const state = contentState[sourceKey];
+
+                let html = `
+                    <div class="mt-8 border-t border-slate-200 pt-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-2 text-slate-500 uppercase tracking-wider text-[10px] font-bold">
+                                <i data-lucide="book-open" class="w-3 h-3"></i>
+                                <span>Learn from framework</span>
+                            </div>
+                            <button onclick="toggleSettingsModal()" class="text-slate-400 hover:text-blue-500 transition-colors">
+                                <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                        <div class="bg-slate-50 rounded-xl p-6 border border-slate-100 overflow-hidden relative min-h-[100px]">
+                `;
+
+                if (state.loading) {
+                    html += `
+                        <div class="absolute inset-0 flex items-center justify-center space-x-3 text-slate-400 bg-slate-50/80 backdrop-blur-[1px] z-10">
+                            <div class="animate-spin rounded-full h-4 w-4 border-2 border-slate-300 border-t-blue-500"></div>
+                            <span class="text-sm">Syncing with Repository...</span>
+                        </div>`;
+                } else if (state.error) {
+                    html += `
+                        <div class="flex flex-col items-center justify-center py-4 space-y-3">
+                            <div class="text-red-500 text-xs flex items-center space-x-2 font-bold uppercase tracking-tight">
+                                <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                                <span>Failed to load ${sourceKey}</span>
+                            </div>
+                            <p class="text-[10px] text-slate-400 text-center">Reference: ${state.error}</p>
+                            <button onclick="fetchFile('${sourceKey}')" class="text-[10px] font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-100 hover:bg-blue-100 transition-all">
+                                Try Re-fetch
+                            </button>
+                        </div>`;
+                } else {
+                    const md = state.data || "No content found.";
+                    const htmlContent = marked.parse(md);
+
+                    html += `
+                        <article class="markdown-frame text-sm leading-relaxed animate-fade-in">
+                            ${htmlContent}
+                        </article>
+                    `;
+                }
+
+                html += `</div></div>`;
+                panel.innerHTML = html;
+            });
+            lucide.createIcons();
+        }
+
+        function goToStep(step) {
+            activeStep = step;
+            updateUI();
+        }
+
+        function nextStep() {
+            if (activeStep < 5) { activeStep++; updateUI(); }
+        }
+
+        function prevStep() {
+            if (activeStep > 1) { activeStep--; updateUI(); }
+        }
+
+        function copyStepContent(type) {
+            let text = "";
+            switch(type) {
+                case 'sms': text = document.getElementById('taillightSms').textContent; break;
+                case 'email': text = document.getElementById('emailBody').textContent; break;
+                case 'crm': text = document.getElementById('crmNotes').textContent; break;
+                case 'ping': text = document.getElementById('fulfillmentPing').textContent; break;
+            }
+            copyTextToClipboard(text);
+            showToast();
+        }
+
+        function copyTextToClipboard(text) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text);
+            } else {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+            }
+        }
+
+        function showToast(msg = "Copied to clipboard") {
+            const toast = document.getElementById('toast');
+            toast.querySelector('span').textContent = msg;
+            toast.classList.remove('opacity-0', 'translate-y-4');
+            toast.classList.add('opacity-100', 'translate-y-0');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-4');
+                toast.classList.remove('opacity-100', 'translate-y-0');
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
